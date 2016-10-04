@@ -1,0 +1,36 @@
+{
+    "author": {
+        "email": "cwysong@indigital.net",
+        "name": "Corey Wysong"
+    },
+    "dependencies": {
+        "promiscuous": "^0.6.0"
+    },
+    "description": "A simple, intuitive, and powerful JavaScript signaling library",
+    "devDependencies": {
+        "browserify": "^4.1.8",
+        "grunt": "~0.4.0",
+        "grunt-browserify": "^2.1.0",
+        "grunt-cli": "~0.1.6",
+        "grunt-contrib-copy": "^0.5.0",
+        "grunt-contrib-jasmine": "~0.8.0",
+        "grunt-contrib-jshint": ">0.5.0",
+        "grunt-contrib-uglify": "~0.2.0",
+        "grunt-peg": "~1.3.1",
+        "grunt-trimtrailingspaces": "^0.4.0",
+        "pegjs": "^0.8.0"
+    },
+    "directories": {},
+    "engines": {
+        "node": ">=0.8"
+    },
+    "license": "MIT",
+    "main": "src/index.js",
+    "name": "sipsdk",
+    "scripts": {
+        "prepublish": "cd src/Grammar && mkdir -p dist && pegjs --extra-options-file peg.json src/Grammar.pegjs dist/Grammar.js",
+        "test": "grunt travis --verbose"
+    },
+    "title": "SIP.js",
+    "version": "0.7.0"
+}
