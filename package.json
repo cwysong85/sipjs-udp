@@ -4,7 +4,8 @@
         "name": "Corey Wysong"
     },
     "dependencies": {
-        "promiscuous": "^0.6.0"
+        "promiscuous": "^0.6.0",
+        "ws": "^0.6.4"
     },
     "description": "A simple, intuitive, and powerful JavaScript signaling library",
     "devDependencies": {
