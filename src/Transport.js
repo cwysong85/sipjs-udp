@@ -1,5 +1,4 @@
 "use strict";
-var dgram = require('dgram');
 
 /**
  * @fileoverview Transport
@@ -11,7 +10,7 @@ var dgram = require('dgram');
  * @param {SIP.UA} ua
  * @param {Object} server ws_server Object
  */
-module.exports = function(SIP, WebSocket) {
+module.exports = function(SIP, dgram) {
   var Transport,
     C = {
       // Transport status codes
