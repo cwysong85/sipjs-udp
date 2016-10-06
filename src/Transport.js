@@ -1,4 +1,6 @@
 "use strict";
+var dgram = require('dgram');
+
 /**
  * @fileoverview Transport
  */
@@ -11,7 +13,6 @@
  */
 module.exports = function(SIP, WebSocket) {
   var Transport,
-    dgram = require('dgram'),
     C = {
       // Transport status codes
       STATUS_READY: 0,

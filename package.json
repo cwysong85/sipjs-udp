@@ -4,7 +4,6 @@
     "name": "Corey Wysong"
   },
   "dependencies": {
-    "dgram": "^1.0.1",
     "promiscuous": "^0.6.0",
     "ws": "^0.6.4"
   },
