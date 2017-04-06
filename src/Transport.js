@@ -25,7 +25,7 @@ module.exports = function(SIP, dgram) {
     this.ua = ua;
     this.ws = null;
     this.server = server;
-    this.client = null;
+    // this.client = null;
     this.reconnection_attempts = 0;
     this.closed = false;
     this.connected = false;
@@ -129,13 +129,14 @@ module.exports = function(SIP, dgram) {
       this.server.on('listening', function() {
         var address = transport.server.address();
 
-        transport.client = dgram.createSocket('udp4');
+        transport.client = this.server;
+        // transport.client = dgram.createSocket('udp4');
 
-        transport.client.on('message', function(msg) {
-          transport.onMessage({
-            data: msg
-          });
-        });
+        // this.server.on('message', function(msg) {
+        //   transport.onMessage({
+        //     data: msg
+        //   });
+        // });
 
         transport.connected = true;
 
