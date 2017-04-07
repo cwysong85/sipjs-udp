@@ -127,17 +127,7 @@ module.exports = function(SIP, dgram) {
       this.server = dgram.createSocket('udp4');
 
       this.server.on('listening', function() {
-        var address = transport.server.address();
-
         transport.client = this.server;
-        // transport.client = dgram.createSocket('udp4');
-
-        // this.server.on('message', function(msg) {
-        //   transport.onMessage({
-        //     data: msg
-        //   });
-        // });
-
         transport.connected = true;
 
         // Disable closed
