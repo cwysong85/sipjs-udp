@@ -1,7 +1,9 @@
 # SIP.js UDP Implementation
 This project is very young and doesn't have much support as of yet. This was a P.O.C. for one of my test applications and works pretty good. This version of SIP.js just replaces the WebSocket transport with the UDP transport.
 
-
+```
+npm install https://github.com/cwysong85/sipjs-udp
+```
 
 ### UAS Implementation
 ```

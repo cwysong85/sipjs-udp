@@ -26,7 +26,7 @@
   },
   "license": "MIT",
   "main": "src/index.js",
-  "name": "sipsdk",
+  "name": "sipjs-udp",
   "scripts": {
     "prepublish": "cd src/Grammar && mkdir -p dist && pegjs --extra-options-file peg.json src/Grammar.pegjs dist/Grammar.js",
     "test": "grunt travis --verbose"
