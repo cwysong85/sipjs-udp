@@ -1,5 +1,4 @@
 "use strict";
-
 /**
  * @fileoverview Transport
  */
@@ -10,8 +9,9 @@
  * @param {SIP.UA} ua
  * @param {Object} server ws_server Object
  */
-module.exports = function(SIP, dgram) {
+module.exports = function(SIP, WebSocket) {
   var Transport,
+    dgram = require('dgram'),
     C = {
       // Transport status codes
       STATUS_READY: 0,
@@ -25,7 +25,7 @@ module.exports = function(SIP, dgram) {
     this.ua = ua;
     this.ws = null;
     this.server = server;
-    // this.client = null;
+    this.client = null;
     this.reconnection_attempts = 0;
     this.closed = false;
     this.connected = false;
@@ -108,7 +108,7 @@ module.exports = function(SIP, dgram) {
 
       var msgToSend = new Buffer(parsedMsgToString);
 
-      this.client.send(msgToSend, 0, msgToSend.length, sendToPort, sendToHost, function(err) {
+      this.server.send(msgToSend, 0, msgToSend.length, sendToPort, sendToHost, function(err) {
         if (err) {
           console.log(err);
         }
@@ -127,7 +127,7 @@ module.exports = function(SIP, dgram) {
       this.server = dgram.createSocket('udp4');
 
       this.server.on('listening', function() {
-        transport.client = this.server;
+        transport.client = transport.server;
         transport.connected = true;
 
         // Disable closed
