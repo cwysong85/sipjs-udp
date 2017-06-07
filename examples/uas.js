@@ -38,7 +38,7 @@ const server = new SIPUDP.UA({
 })
 
 server.on('connected', () => {
-    console.log('SIP server started')
+    console.log('SIP server started!')
 })
 
 server.on('disconnected', () => {
@@ -49,5 +49,3 @@ server.on('invite', (session) => {
     console.log('SIP INVITE recv')
     console.log(session)
 })
-
-console.log(server);
