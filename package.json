@@ -3,6 +3,10 @@
     "email": "cwysong@indigital.net",
     "name": "Corey Wysong"
   },
+  "repository": { 
+    "type": "git",
+    "url": "https://github.com/cwysong85/sipjs-udp"
+  },
   "dependencies": {
     "promiscuous": "^0.6.0"
   },
