@@ -152,10 +152,16 @@ function reply(status_code) {
     response = SIP.Utils.buildStatusLine(status_code),
     vias = message.getHeaders('via'),
     length = vias.length,
-    idx = 0;
+    idx = 0, host, port = 5060;
 
   for(idx; idx < length; idx++) {
     response += "Via: " + vias[idx] + "\r\n";
+  }
+
+  if(length > 0) {
+    var via = this.parseHeader('Via');
+    host = via.host;
+    port = via.port || 5060;
   }
 
   to = message.getHeader('To');
@@ -170,7 +176,7 @@ function reply(status_code) {
   response += "CSeq: " + message.cseq + " " + message.method + "\r\n";
   response += "\r\n";
 
-  transport.send(response);
+  transport.send(host, port, response);
 }
 
 requests.push(rfc3261_8_2_2_1);

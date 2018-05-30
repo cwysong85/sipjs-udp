@@ -10,7 +10,7 @@
 
 module.exports = function (name, version) {
 return {
-  USER_AGENT: name +'/'+ version,
+  USER_AGENT: name + "/" + version,
 
   // SIP scheme
   SIP:  'sip',

@@ -44,78 +44,22 @@ module.exports = function(SIP, WebSocket) {
      * @param {SIP.OutgoingRequest|String} msg
      * @returns {Boolean}
      */
-    send: function(msg) {
-
-      var sendToHost = null, sendToPort = 5060, parsedMsg;
-
-      if(typeof msg === 'string') {
-        // parse message
-        parsedMsg = SIP.Parser.parseMessage(msg, this.ua);
-
-        if(!parsedMsg) {
-          return false;
-        }
-
-      } else {
-
-        if(msg instanceof SIP.OutgoingRequest) {
-          // All outgoing requests have URIs...
-          // But if there is a Route header then we need to use that instead of the RURI
-
-          var routeHdr = msg.getHeader('Route');
-          if(routeHdr !== undefined) {
-            // remove < and >
-            var route = routeHdr.replace('<', '').replace('>', '');
-
-            var routeUri = SIP.URI.parse(route);
-            sendToHost = routeUri.host;
-            sendToPort = routeUri.port || 5060;
-          } else {
-            sendToHost = msg.ruri.host;
-            sendToPort = msg.ruri.port || 5060;
-          }
-
-        }
-
-        parsedMsg = msg.toString();
-      }
-
-      if(parsedMsg.via) {
-        // use via to send
-        if(parsedMsg.via.host) {
-          sendToHost = parsedMsg.via.host;
-        }
-        if(parsedMsg.via.port) {
-          sendToPort = parsedMsg.via.port;
-        }
-      }
-
-      if(parsedMsg.from && parsedMsg.from.uri && parsedMsg.from.uri.port) {
-        sendToPort = parsedMsg.from.uri.port;
-      }
-
-      if(!sendToHost) {
-        if(parsedMsg.from && parsedMsg.from.uri && parsedMsg.from.uri.host) {
-          sendToHost = parsedMsg.from.uri.host;
-        }
-      }
-
-      var parsedMsgToString = parsedMsg.toString();
+    send: function(host, port, msg) {
+      var message = msg.toString();
 
       if (this.ua.configuration.traceSip === true) {
-        this.logger.log('sending UDP message:\n\n' + parsedMsgToString + '\n');
+        this.logger.log('sending UDP message:\n\n' + message + '\n');
       }
 
-      var msgToSend = new Buffer(parsedMsgToString);
+      var msgToSend = new Buffer(message);
 
-      this.server.send(msgToSend, 0, msgToSend.length, sendToPort, sendToHost, function(err) {
+      this.server.send(msgToSend, 0, msgToSend.length, port, host, function(err) {
         if (err) {
           console.log(err);
+          return false;
         }
       });
-
       return true;
-
     },
 
     /**

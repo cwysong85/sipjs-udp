@@ -492,12 +492,19 @@ IncomingRequest.prototype.reply_sl = function(code, reason) {
   var to, response,
     v = 0,
     vias = this.getHeaders('via'),
-    length = vias.length;
+    length = vias.length,
+    host, port = 5060;
 
   response = SIP.Utils.buildStatusLine(code, reason);
 
   for(v; v < length; v++) {
     response += 'Via: ' + vias[v] + '\r\n';
+  }
+
+  if(length > 0) {
+    var via = this.parseHeader('Via');
+    host = via.host;
+    port = via.port;
   }
 
   to = this.getHeader('To');
@@ -515,7 +522,7 @@ IncomingRequest.prototype.reply_sl = function(code, reason) {
   response += 'User-Agent: ' + this.ua.configuration.userAgentString +'\r\n';
   response += 'Content-Length: ' + 0 + '\r\n\r\n';
 
-  this.transport.send(response);
+  this.transport.send(host, port, response);
 };
 
 

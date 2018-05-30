@@ -3,7 +3,7 @@
     "email": "cwysong@indigital.net",
     "name": "Corey Wysong"
   },
-  "repository": { 
+  "repository": {
     "type": "git",
     "url": "https://github.com/cwysong85/sipjs-udp"
   },
@@ -35,6 +35,6 @@
     "prepublish": "cd src/Grammar && mkdir -p dist && pegjs --extra-options-file peg.json src/Grammar.pegjs dist/Grammar.js",
     "test": "grunt travis --verbose"
   },
-  "title": "SIP.js",
-  "version": "0.0.2"
+  "title": "sipjs-udp",
+  "version": "0.0.3"
 }

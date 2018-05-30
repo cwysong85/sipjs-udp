@@ -42,9 +42,17 @@ var NonInviteClientTransaction = function(request_sender, request, transport) {
   this.request_sender = request_sender;
   this.request = request;
 
+  var ruri = this.request.ruri;
+  if(!(this.request.ruri instanceof SIP.URI)) {
+    ruri = SIP.URI.parse(this.request.ruri)
+  }
+
+  this.host = ruri.host;
+  this.port = ruri.port;
+
   this.logger = request_sender.ua.getLogger('sip.transaction.nict', this.id);
 
-  via = 'SIP/2.0/' + (request_sender.ua.configuration.hackViaTcp ? 'UDP' : transport.server.scheme);
+  via = 'SIP/2.0/UDP';
   via += ' ' + request_sender.ua.configuration.viaHost + ':' + request_sender.ua.configuration.viaPort + ';branch=' + this.id;
 
   this.request.setHeader('via', via);
@@ -64,7 +72,7 @@ NonInviteClientTransaction.prototype.send = function() {
   this.stateChanged(C.STATUS_TRYING);
   this.F = SIP.Timers.setTimeout(tr.timer_F.bind(tr), SIP.Timers.TIMER_F);
 
-  if(!this.transport.send(this.request)) {
+  if(!this.transport.send(this.host, this.port, this.request)) {
     this.onTransportError();
   }
 };
@@ -143,9 +151,17 @@ var InviteClientTransaction = function(request_sender, request, transport) {
   this.request_sender = request_sender;
   this.request = request;
 
+  var ruri = this.request.ruri;
+  if(!(this.request.ruri instanceof SIP.URI)) {
+    ruri = SIP.URI.parse(this.request.ruri)
+  }
+
+  this.host = ruri.host;
+  this.port = ruri.port;
+
   this.logger = request_sender.ua.getLogger('sip.transaction.ict', this.id);
 
-  via = 'SIP/2.0/' + (request_sender.ua.configuration.hackViaTcp ? 'UDP' : transport.server.scheme);
+  via = 'SIP/2.0/UDP';
   via += ' ' + request_sender.ua.configuration.viaHost + ':' + request_sender.ua.configuration.viaPort + ';branch=' + this.id;
 
   this.request.setHeader('via', via);
@@ -170,7 +186,7 @@ InviteClientTransaction.prototype.send = function() {
   this.stateChanged(C.STATUS_CALLING);
   this.B = SIP.Timers.setTimeout(tr.timer_B.bind(tr), SIP.Timers.TIMER_B);
 
-  if(!this.transport.send(this.request)) {
+  if(!this.transport.send(this.host, this.port, this.request)) {
     this.onTransportError();
   }
 };
@@ -234,7 +250,7 @@ InviteClientTransaction.prototype.sendACK = function(response) {
 
   this.D = SIP.Timers.setTimeout(tr.timer_D.bind(tr), SIP.Timers.TIMER_D);
 
-  this.transport.send(this.ack);
+  this.transport.send(this.host, this.port, this.ack);
 };
 
 InviteClientTransaction.prototype.cancel_request = function(tr, reason) {
@@ -261,7 +277,7 @@ InviteClientTransaction.prototype.cancel_request = function(tr, reason) {
 
   // Send only if a provisional response (>100) has been received.
   if(this.state === C.STATUS_PROCEEDING) {
-    this.transport.send(this.cancel);
+    this.transport.send(this.host, this.port, this.cancel);
   }
 };
 
@@ -276,7 +292,7 @@ InviteClientTransaction.prototype.receiveResponse = function(response) {
         this.stateChanged(C.STATUS_PROCEEDING);
         this.request_sender.receiveResponse(response);
         if(this.cancel) {
-          this.transport.send(this.cancel);
+          this.transport.send(this.host, this.port, this.cancel);
         }
         break;
       case C.STATUS_PROCEEDING:
@@ -326,9 +342,17 @@ var AckClientTransaction = function(request_sender, request, transport) {
   this.request_sender = request_sender;
   this.request = request;
 
+  var ruri = this.request.ruri;
+  if(!(this.request.ruri instanceof SIP.URI)) {
+    ruri = SIP.URI.parse(this.request.ruri)
+  }
+
+  this.host = ruri.host;
+  this.port = ruri.port;
+
   this.logger = request_sender.ua.getLogger('sip.transaction.nict', this.id);
 
-  via = 'SIP/2.0/' + (request_sender.ua.configuration.hackViaTcp ? 'UDP' : transport.server.scheme);
+  via = 'SIP/2.0/UDP';
   via += ' ' + request_sender.ua.configuration.viaHost + ':' + request_sender.ua.configuration.viaPort + ';branch=' + this.id;
 
   this.request.setHeader('via', via);
@@ -336,7 +360,7 @@ var AckClientTransaction = function(request_sender, request, transport) {
 AckClientTransaction.prototype = Object.create(SIP.EventEmitter.prototype);
 
 AckClientTransaction.prototype.send = function() {
-  if(!this.transport.send(this.request)) {
+  if(!this.transport.send(this.host, this.port, this.request)) {
     this.onTransportError();
   }
 };
@@ -355,6 +379,8 @@ AckClientTransaction.prototype.onTransportError = function() {
 */
 var NonInviteServerTransaction = function(request, ua) {
   this.type = C.NON_INVITE_SERVER;
+  this.host = request.via.host;
+  this.port = request.via.port || 5060;
   this.id = request.via_branch;
   this.request = request;
   this.transport = request.transport;
@@ -406,13 +432,13 @@ NonInviteServerTransaction.prototype.receiveResponse = function(status_code, res
     switch(this.state) {
       case C.STATUS_TRYING:
         this.stateChanged(C.STATUS_PROCEEDING);
-        if(!this.transport.send(response))  {
+        if(!this.transport.send(this.host, this.port, response))  {
           this.onTransportError();
         }
         break;
       case C.STATUS_PROCEEDING:
         this.last_response = response;
-        if(!this.transport.send(response)) {
+        if(!this.transport.send(this.host, this.port, response)) {
           this.onTransportError();
           deferred.reject();
         } else {
@@ -427,7 +453,7 @@ NonInviteServerTransaction.prototype.receiveResponse = function(status_code, res
         this.stateChanged(C.STATUS_COMPLETED);
         this.last_response = response;
         this.J = SIP.Timers.setTimeout(tr.timer_J.bind(tr), SIP.Timers.TIMER_J);
-        if(!this.transport.send(response)) {
+        if(!this.transport.send(this.host, this.port, response)) {
           this.onTransportError();
           deferred.reject();
         } else {
@@ -450,6 +476,8 @@ NonInviteServerTransaction.prototype.receiveResponse = function(status_code, res
 */
 var InviteServerTransaction = function(request, ua) {
   this.type = C.INVITE_SERVER;
+  this.host = request.via.host;
+  this.port = request.via.port || 5060;
   this.id = request.via_branch;
   this.request = request;
   this.transport = request.transport;
@@ -521,7 +549,7 @@ InviteServerTransaction.prototype.onTransportError = function() {
 };
 
 InviteServerTransaction.prototype.resend_provisional = function() {
-  if(!this.transport.send(this.last_response)) {
+  if(!this.transport.send(this.host, this.port, this.last_response)) {
     this.onTransportError();
   }
 };
@@ -534,7 +562,7 @@ InviteServerTransaction.prototype.receiveResponse = function(status_code, respon
   if(status_code >= 100 && status_code <= 199) {
     switch(this.state) {
       case C.STATUS_PROCEEDING:
-        if(!this.transport.send(response)) {
+        if(!this.transport.send(this.host, this.port, response)) {
           this.onTransportError();
         }
         this.last_response = response;
@@ -562,7 +590,7 @@ InviteServerTransaction.prototype.receiveResponse = function(status_code, respon
         /* falls through */
         case C.STATUS_ACCEPTED:
           // Note that this point will be reached for proceeding tr.state also.
-          if(!this.transport.send(response)) {
+          if(!this.transport.send(this.host, this.port, response)) {
             this.onTransportError();
             deferred.reject();
           } else {
@@ -578,7 +606,7 @@ InviteServerTransaction.prototype.receiveResponse = function(status_code, respon
           this.resendProvisionalTimer = null;
         }
 
-        if(!this.transport.send(response)) {
+        if(!this.transport.send(this.host, this.port, response)) {
           this.onTransportError();
           deferred.reject();
         } else {
@@ -625,7 +653,7 @@ var checkTransaction = function(ua, request) {
       if(tr) {
         switch(tr.state) {
           case C.STATUS_PROCEEDING:
-            tr.transport.send(tr.last_response);
+            tr.transport.send(tr.host, tr.port, tr.last_response);
             break;
 
             // RFC 6026 7.1 Invite retransmission
@@ -679,7 +707,7 @@ var checkTransaction = function(ua, request) {
             break;
           case C.STATUS_PROCEEDING:
           case C.STATUS_COMPLETED:
-            tr.transport.send(tr.last_response);
+            tr.transport.send(tr.host, tr.port, tr.last_response);
             break;
         }
         return true;
