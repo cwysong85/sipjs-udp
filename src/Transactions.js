@@ -43,7 +43,7 @@ module.exports = function(SIP) {
     this.request = request;
 
     // if route header, send to it else send to RURI
-    var r;
+    var r, usingRoute = false;
     if (this.request.hasHeader("Route")) {
       var routeHdr = this.request.getHeaders("Route");
       if (routeHdr[0]) {
@@ -51,9 +51,16 @@ module.exports = function(SIP) {
 
         // parse this URI
         r = SIP.URI.parse(r);
-      }
-    } else {
 
+        // is route myself?
+        if(r.host !== request_sender.ua.configuration.viaHost && r.port !== request_sender.ua.configuration.viaPort) {
+          // only use the route header if we are not the route destination
+          usingRoute = true;
+        }
+      }
+    }
+
+    if(!usingRoute){
       var ruri = this.request.ruri;
       if (!(this.request.ruri instanceof SIP.URI)) {
         ruri = SIP.URI.parse(this.request.ruri)
@@ -172,7 +179,7 @@ module.exports = function(SIP) {
     this.request = request;
 
     // if route header, send to it else send to RURI
-    var r;
+    var r, usingRoute = false;
     if (this.request.hasHeader("Route")) {
       var routeHdr = this.request.getHeaders("Route");
       if (routeHdr[0]) {
@@ -180,9 +187,16 @@ module.exports = function(SIP) {
 
         // parse this URI
         r = SIP.URI.parse(r);
-      }
-    } else {
 
+        // is route myself?
+        if(r.host !== request_sender.ua.configuration.viaHost && r.port !== request_sender.ua.configuration.viaPort) {
+          // only use the route header if we are not the route destination
+          usingRoute = true;
+        }
+      }
+    }
+
+    if(!usingRoute){
       var ruri = this.request.ruri;
       if (!(this.request.ruri instanceof SIP.URI)) {
         ruri = SIP.URI.parse(this.request.ruri)
@@ -384,7 +398,7 @@ module.exports = function(SIP) {
 
 
     // if route header, send to it else send to RURI
-    var r;
+    var r, usingRoute = false;
     if (this.request.hasHeader("Route")) {
       var routeHdr = this.request.getHeaders("Route");
       if (routeHdr[0]) {
@@ -392,9 +406,16 @@ module.exports = function(SIP) {
 
         // parse this URI
         r = SIP.URI.parse(r);
-      }
-    } else {
 
+        // is route myself?
+        if(r.host !== request_sender.ua.configuration.viaHost && r.port !== request_sender.ua.configuration.viaPort) {
+          // only use the route header if we are not the route destination
+          usingRoute = true;
+        }
+      }
+    }
+
+    if(!usingRoute){
       var ruri = this.request.ruri;
       if (!(this.request.ruri instanceof SIP.URI)) {
         ruri = SIP.URI.parse(this.request.ruri)
