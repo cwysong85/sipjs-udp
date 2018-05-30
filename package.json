@@ -36,5 +36,5 @@
     "test": "grunt travis --verbose"
   },
   "title": "sipjs-udp",
-  "version": "0.0.3"
+  "version": "0.0.5"
 }
