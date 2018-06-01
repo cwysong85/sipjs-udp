@@ -43,30 +43,28 @@ module.exports = function(SIP) {
     this.request = request;
 
     // if route header, send to it else send to RURI
-    var r, usingRoute = false;
-    if (this.request.hasHeader("Route")) {
+    var r = {};
+    if (this.request.getHeaders("Route").length > 0) {
       var routeHdr = this.request.getHeaders("Route");
       if (routeHdr[0]) {
         r = routeHdr[0].replace('<', '').replace('>', '');
-
         // parse this URI
         r = SIP.URI.parse(r);
-
-        // is route myself?
-        if(r.host !== request_sender.ua.configuration.viaHost && r.port !== request_sender.ua.configuration.viaPort) {
-          // only use the route header if we are not the route destination
-          usingRoute = true;
-        }
       }
-    }
+    } else {
 
-    if(!usingRoute){
       var ruri = this.request.ruri;
       if (!(this.request.ruri instanceof SIP.URI)) {
         ruri = SIP.URI.parse(this.request.ruri)
       }
 
       r = ruri;
+    }
+
+    if(!r.host) {
+      // todo error out properly
+      console.log('No route to host')
+      return;
     }
 
     this.host = r.host;
@@ -179,30 +177,28 @@ module.exports = function(SIP) {
     this.request = request;
 
     // if route header, send to it else send to RURI
-    var r, usingRoute = false;
-    if (this.request.hasHeader("Route")) {
+    var r = {};
+    if (this.request.getHeaders("Route").length > 0) {
       var routeHdr = this.request.getHeaders("Route");
       if (routeHdr[0]) {
         r = routeHdr[0].replace('<', '').replace('>', '');
-
         // parse this URI
         r = SIP.URI.parse(r);
-
-        // is route myself?
-        if(r.host !== request_sender.ua.configuration.viaHost && r.port !== request_sender.ua.configuration.viaPort) {
-          // only use the route header if we are not the route destination
-          usingRoute = true;
-        }
       }
-    }
+    } else {
 
-    if(!usingRoute){
       var ruri = this.request.ruri;
       if (!(this.request.ruri instanceof SIP.URI)) {
         ruri = SIP.URI.parse(this.request.ruri)
       }
 
       r = ruri;
+    }
+
+    if(!r.host) {
+      // todo error out properly
+      console.log('No route to host')
+      return;
     }
 
     this.host = r.host;
@@ -398,30 +394,28 @@ module.exports = function(SIP) {
 
 
     // if route header, send to it else send to RURI
-    var r, usingRoute = false;
-    if (this.request.hasHeader("Route")) {
+    var r = {};
+    if (this.request.getHeaders("Route").length > 0) {
       var routeHdr = this.request.getHeaders("Route");
       if (routeHdr[0]) {
         r = routeHdr[0].replace('<', '').replace('>', '');
-
         // parse this URI
         r = SIP.URI.parse(r);
-
-        // is route myself?
-        if(r.host !== request_sender.ua.configuration.viaHost && r.port !== request_sender.ua.configuration.viaPort) {
-          // only use the route header if we are not the route destination
-          usingRoute = true;
-        }
       }
-    }
+    } else {
 
-    if(!usingRoute){
       var ruri = this.request.ruri;
       if (!(this.request.ruri instanceof SIP.URI)) {
         ruri = SIP.URI.parse(this.request.ruri)
       }
 
       r = ruri;
+    }
+
+    if(!r.host) {
+      // todo error out properly
+      console.log('No route to host')
+      return;
     }
 
     this.host = r.host;
