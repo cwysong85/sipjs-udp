@@ -21,6 +21,8 @@ const server = new SIPUDP.UA({
   // The host and port are used to start the server
   uri: 'simple-uas@' + host + ':' + port,
 
+  bind: host,
+
   // auto start...
   autostart: true,
 

@@ -731,6 +731,7 @@ module.exports = function(SIP, environment) {
                 usePreloadedRoute: false,
                 //string to be inserted into User-Agent request header
                 userAgentString: SIP.C.USER_AGENT,
+                bind: "127.0.0.1",
                 // Session parameters
                 iceCheckingTimeout: 5000,
                 noAnswerTimeout: 60,
@@ -959,7 +960,7 @@ module.exports = function(SIP, environment) {
                 "hackWssInTransport", //false
                 "iceCheckingTimeout", "instanceId", "noAnswerTimeout", // 30 seconds.
                 "password", "registerExpires", // 600 seconds.
-                "registrarServer", "reliable", "rel100", "replaces", "userAgentString", //SIP.C.USER_AGENT
+                "registrarServer", "reliable", "rel100", "replaces", "userAgentString", "bind", //SIP.C.USER_AGENT
                 "autostart", "doUAS", "cluster", "stunServers", "traceSip", "turnServers", "usePreloadedRoute", "wsServerMaxReconnection", "wsServerReconnectionTimeout", "mediaHandlerFactory", "media", "mediaConstraints", "authenticationFactory",
                 // Post-configuration generated parameters
                 "via_core_value", "viaHost", "viaPort"
@@ -1258,6 +1259,11 @@ module.exports = function(SIP, environment) {
             userAgentString: function(userAgentString) {
                 if (typeof userAgentString === 'string') {
                     return userAgentString;
+                }
+            },
+            bind: function(bind) {
+                if (typeof bind === 'string') {
+                    return bind;
                 }
             },
             usePreloadedRoute: function(usePreloadedRoute) {

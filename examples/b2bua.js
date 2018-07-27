@@ -124,6 +124,8 @@ const server = new SIPUDP.UA({
   // The host and port are used when creating the UDP server
   uri: 'b2bua@' + host + ':' + port,
 
+  bind: host,
+
   // start the server when we create this UA class
   autostart: true,
 
