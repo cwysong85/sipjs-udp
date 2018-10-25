@@ -5,7 +5,6 @@
  * @param {function returning SIP.MediaHandler} [configuration.mediaHandlerFactory]
  *        A function will be invoked by each of the UA's Sessions to build the MediaHandler for that Session.
  *        If no (or a falsy) value is provided, each Session will use a default (WebRTC) MediaHandler.
- *
  * @param {Object} [configuration.media] gets passed to SIP.MediaHandler.getDescription as mediaHint
  */
 module.exports = function(SIP, environment) {
@@ -62,6 +61,12 @@ module.exports = function(SIP, environment) {
             nict: {},
             ist: {},
             ict: {}
+        };
+        this.optionsStatus = {
+            vendor: true,
+            dbstate: true,
+            vendorNumbers: true,
+            maxSessions: false
         };
         this.transportRecoverAttempts = 0;
         this.transportRecoveryTimer = null;
@@ -151,6 +156,23 @@ module.exports = function(SIP, environment) {
         this.registerContext.register(options);
         return this;
     };
+
+    UA.prototype.setVendorStatus = function(status) {
+        this.optionsStatus.vendor = status;
+    };
+
+    UA.prototype.setDbStatus = function(status) {
+        this.optionsStatus.dbstate = status;
+    };
+
+    UA.prototype.setVendorNumbersStatus = function(status) {
+        this.optionsStatus.vendorNumbers = status;
+    };
+
+    UA.prototype.setMaxSessionsStatus = function(status) {
+        this.optionsStatus.maxSessions= status;
+    };
+
     /**
      * Unregister.
      *
@@ -501,8 +523,13 @@ module.exports = function(SIP, environment) {
          * They are processed as if they had been received outside the dialog.
          */
         if (method === SIP.C.OPTIONS) {
-            new SIP.Transactions.NonInviteServerTransaction(request, this);
-            request.reply(200, null, ['Allow: ' + SIP.Utils.getAllowedMethods(this), 'Accept: ' + C.ACCEPTED_BODY_TYPES]);
+
+            if (this.configuration.optionsHandler == null){
+                this.resolveOptions(200, request)
+            } else {
+                this.resolveOptions(this.configuration.optionsHandler(), request);
+            }
+
         } else if (method === SIP.C.MESSAGE) {
             if (!this.listeners(methodLower).length) {
                 // UA is not listening for this.  Reject immediately.
@@ -614,6 +641,20 @@ module.exports = function(SIP, environment) {
     UA.prototype.findSession = function(request) {
         return this.sessions[request.call_id + request.from_tag] || this.sessions[request.call_id + request.to_tag] || null;
     };
+
+    UA.prototype.onSipOptions = function(request) {
+        if (this.optionsStatus.vendor == false) {
+            //respond 503
+        } else if (this.optionsStatus.dbstate == false) {
+            //respond 500
+        } else if (this.optionsStatus.vendorNumbers == false) {
+            //respond 480
+        } else if (this.optionsStatus.maxSessions == true) {
+            //respond 480
+        } else {
+            //respond 200
+        }
+    };
     /**
      * Get the dialog to which the request belongs to, if any.
      * @private
@@ -684,6 +725,7 @@ module.exports = function(SIP, environment) {
         }, nextRetry * 1000);
     };
 
+
     function checkAuthenticationFactory(authenticationFactory) {
         if (!(authenticationFactory instanceof Function)) {
             return;
@@ -694,6 +736,10 @@ module.exports = function(SIP, environment) {
             };
         }
         return authenticationFactory;
+    }
+    UA.prototype.resolveOptions = function(statusCode, request) {
+        new SIP.Transactions.NonInviteServerTransaction(request, this);
+        request.reply(statusCode, null, ['Allow: ' + SIP.Utils.getAllowedMethods(this), 'Accept: ' + C.ACCEPTED_BODY_TYPES]);
     }
     /**
      * Configuration load.
@@ -757,6 +803,7 @@ module.exports = function(SIP, environment) {
                 // http://tools.ietf.org/html/rfc3891
                 replaces: SIP.C.supported.UNSUPPORTED,
                 mediaHandlerFactory: SIP.WebRTC.MediaHandler.defaultFactory,
+                optionsHandler: null,
                 authenticationFactory: checkAuthenticationFactory(function authenticationFactory(ua) {
                     return new SIP.DigestAuthentication(ua);
                 })
@@ -961,7 +1008,7 @@ module.exports = function(SIP, environment) {
                 "iceCheckingTimeout", "instanceId", "noAnswerTimeout", // 30 seconds.
                 "password", "registerExpires", // 600 seconds.
                 "registrarServer", "reliable", "rel100", "replaces", "userAgentString", "bind", //SIP.C.USER_AGENT
-                "autostart", "doUAS", "cluster", "stunServers", "traceSip", "turnServers", "usePreloadedRoute", "wsServerMaxReconnection", "wsServerReconnectionTimeout", "mediaHandlerFactory", "media", "mediaConstraints", "authenticationFactory",
+                "autostart", "doUAS", "cluster", "stunServers", "traceSip", "turnServers", "usePreloadedRoute", "wsServerMaxReconnection", "wsServerReconnectionTimeout", "mediaHandlerFactory","optionsHandler", "media", "mediaConstraints", "authenticationFactory",
                 // Post-configuration generated parameters
                 "via_core_value", "viaHost", "viaPort"
             ];
@@ -1292,6 +1339,11 @@ module.exports = function(SIP, environment) {
             autostart: function(autostart) {
                 if (typeof autostart === 'boolean') {
                     return autostart;
+                }
+            },
+            optionsHandler: function(optionsHandler){
+                if (optionsHandler!=null && optionsHandler instanceof Function){
+                    return optionsHandler;
                 }
             },
             mediaHandlerFactory: function(mediaHandlerFactory) {
