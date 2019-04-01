@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="iso-8859-2" ?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+<scenario name="Unsolicited NOTIFY with INVITE afterwards">
+
+  <!-- Send unsolicited NOTIFY        -->
+  <!-- <send retrans="500" crlf="true">
+    <![CDATA[
+
+      NOTIFY sip:simple-uas@127.0.0.1:5060 SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: <sip:sipp@[local_ip]>;tag=[call_number]
+      To: <sip:simple-uas@[local_ip]>;tag=p84fh0fm8v
+      Call-ID: [call_id]
+      CSeq: [cseq] NOTIFY
+      Contact: sip:[local_ip]:[local_port]
+      Max-Forwards: 10
+      Allow: ACK,CANCEL,BYE,OPTIONS,NOTIFY,INVITE,UPDATE,MESSAGE,REFER
+      Event: refer
+      Subscription-State: terminated;reason=nosource
+      Content-Length: [len]
+      Content-Type: message/sipfrag
+
+      SIP/2.0 503 Service Unavailable
+
+    ]]>
+  </send>
+
+  <recv response="481">
+  </recv> -->
+
+  <send retrans="500" crlf="true">
+      <![CDATA[
+
+      INVITE sip:simple-uas@127.0.0.1:5060 SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      Max-Forwards: 10
+      From: <sip:sipp@[local_ip]>;tag=[call_number]
+      To: <sip:simple-uas@[local_ip]>;tag=p84fh0fm8v
+      Call-ID: [call_id]
+      CSeq: [cseq] INVITE
+      Contact: sip:[local_ip]:[local_port]
+      Expires: 300
+      Content-Length: 241
+      Content-Type: application/sdp
+
+      v=0
+      o=- 3763118999 3763118999 IN IP4 172.19.238.11
+      s=HAM-Gateway
+      c=IN IP4 172.19.238.11
+      t=0 0
+      m=message 2855 TCP/MSRP *
+      a=accept-types:text/plain text/x-msrp-heartbeat
+      a=setup:passive
+      a=path:msrp://172.19.238.11:2855/16fakjftr4;tcp
+
+      ]]>
+  </send>
+  
+  <recv response="481">
+  </recv>
+
+</scenario>

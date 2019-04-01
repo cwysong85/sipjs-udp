@@ -514,9 +514,17 @@ module.exports = function(SIP, environment) {
             return;
         }
         // Check transaction
-        if (SIP.Transactions.checkTransaction(this, request)) {
+        var st = SIP.Transactions.checkTransaction(this, request);
+        if (st) {
             return;
         }
+
+        // If st is undefined, there was no transaction found. Pass to normal transaction process
+        // https://github.com/cwysong85/sipjs-udp/issues/4
+        if (st === undefined) {
+          transaction = new SIP.ServerContext(this, request);
+        }
+
         /* RFC3261 12.2.2
          * Requests that do not change in any way the state of a dialog may be
          * received within a dialog (for example, an OPTIONS request).
