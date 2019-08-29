@@ -241,6 +241,16 @@ module.exports = function(SIP, environment) {
         options.body = body;
         return this.request(SIP.C.MESSAGE, target, options);
     };
+    UA.prototype.notify = function(target, body, options) {
+        if (body === undefined) {
+            throw new TypeError('Not enough arguments');
+        }
+        // There is no Message module, so it is okay that the UA handles defaults here.
+        options = Object.create(options || Object.prototype);
+        options.contentType || (options.contentType = 'text/plain');
+        options.body = body;
+        return this.request(SIP.C.NOTIFY, target, options);
+    };
     UA.prototype.request = function(method, target, options) {
         var req = new SIP.ClientContext(this, method, target, options);
         this.afterConnected(req.send.bind(req));
@@ -550,6 +560,18 @@ module.exports = function(SIP, environment) {
             message.content_type = request.getHeader('Content-Type') || 'text/plain';
             request.reply(200, null);
             this.emit('message', message);
+        } else if (method === SIP.C.SUBSCRIBE) {
+            if (!this.listeners(methodLower).length) {
+                // UA is not listening for this.  Reject immediately.
+                new SIP.Transactions.NonInviteServerTransaction(request, this);
+                request.reply(405, null, ['Allow: ' + SIP.Utils.getAllowedMethods(this)]);
+                return;
+            }
+            message = new SIP.ServerContext(this, request);
+            message.body = request.body;
+            message.content_type = request.getHeader('Content-Type') || 'text/plain';
+            request.reply(200, null);
+            this.emit('subscribe', message);
         } else if (method !== SIP.C.INVITE && method !== SIP.C.ACK) {
             // Let those methods pass through to normal processing for now.
             transaction = new SIP.ServerContext(this, request);
