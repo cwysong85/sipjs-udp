@@ -190,7 +190,8 @@ Session.prototype = {
         withReplaces =
           target instanceof SIP.InviteServerContext ||
           target instanceof SIP.InviteClientContext,
-        originalTarget = target;
+        originalTarget = target,
+        doNotHangUp = options.doNotHangUp || false;
 
     if (target === undefined) {
       throw new TypeError('Not enough arguments');
@@ -240,8 +241,8 @@ Session.prototype = {
         if ( ! /^2[0-9]{2}$/.test(response.status_code) ) {
           return;
         }
-        // hang up only if we transferred to a SIP address
-        if (withReplaces || (target.scheme && target.scheme.match("^sips?$"))) {
+        // hang up only if we transferred to a SIP address and doNotHangUp is not true
+        if ((withReplaces || (target.scheme && target.scheme.match("^sips?$"))) && !doNotHangUp) {
           this.terminate();
         }
       }.bind(this)

@@ -159,7 +159,7 @@ function reply(status_code) {
   }
 
   if(length > 0) {
-    var via = this.parseHeader('Via');
+    var via = message.parseHeader('Via');
     host = via.host;
     port = via.port || 5060;
   }
