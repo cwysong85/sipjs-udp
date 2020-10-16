@@ -724,6 +724,9 @@ Session.prototype = {
           }
         }
         break;
+      case SIP.C.NOTIFY:
+        this.emit('notify', request);
+        break;
     }
   },
 
