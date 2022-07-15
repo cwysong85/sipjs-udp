@@ -529,12 +529,6 @@ module.exports = function(SIP, environment) {
             return;
         }
 
-        // If st is undefined, there was no transaction found. Pass to normal transaction process
-        // https://github.com/cwysong85/sipjs-udp/issues/4
-        if (st === undefined) {
-          transaction = new SIP.ServerContext(this, request);
-        }
-
         /* RFC3261 12.2.2
          * Requests that do not change in any way the state of a dialog may be
          * received within a dialog (for example, an OPTIONS request).
@@ -644,7 +638,7 @@ module.exports = function(SIP, environment) {
                     session.receiveRequest(request);
                 } else {
                     this.logger.warn('received NOTIFY request for a non existent session');
-                    request.reply(481, 'Subscription does not exist');
+                    request.reply_sl(481, 'Subscription does not exist');
                 }
             }
             /* RFC3261 12.2.2
@@ -654,7 +648,7 @@ module.exports = function(SIP, environment) {
              */
             else {
                 if (method !== SIP.C.ACK) {
-                    request.reply(481);
+                    request.reply_sl(481);
                 }
             }
         }
