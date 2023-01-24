@@ -177,8 +177,6 @@ Session.prototype = {
       throw new TypeError('Invalid statusCode: '+ statusCode);
     }
 
-    options.receiveResponse = function () {};
-
     return this.
       sendRequest(SIP.C.BYE, options).
       terminated();
@@ -578,6 +576,7 @@ Session.prototype = {
     .then(function(body) {
       request.reply(200, null, ['Contact: ' + self.contact], body,
         function() {
+          self.emit('updated', self, request);
           self.status = C.STATUS_WAITING_FOR_ACK;
           self.setInvite2xxTimer(request, body);
           self.setACKTimer();
