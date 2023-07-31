@@ -504,7 +504,7 @@ IncomingRequest.prototype.reply_sl = function(code, reason) {
   if(length > 0) {
     var via = this.parseHeader('Via');
     host = via.host;
-    port = via.port;
+    port = via.port || 5060;
   }
 
   to = this.getHeader('To');
