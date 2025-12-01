@@ -51,7 +51,7 @@ module.exports = function(SIP, WebSocket) {
                 this.logger.log('sending UDP message:\n\n' + message + '\n');
             }
 
-            var msgToSend = new Buffer(message);
+            var msgToSend = Buffer.from(message);
 
             this.server.send(msgToSend, 0, msgToSend.length, port, host, function(err) {
                 if (err) {

@@ -6,7 +6,7 @@
     "sip",
     "udp"
   ],
-  "version": "0.0.18",
+  "version": "0.0.19",
   "license": "MIT",
   "author": {
     "email": "cwysong@indigital.net",
@@ -18,7 +18,7 @@
   },
   "main": "src/index.js",
   "engines": {
-    "node": ">=18 <19"
+    "node": ">=18"
   },
   "dependencies": {
     "promiscuous": "0.7.2"
